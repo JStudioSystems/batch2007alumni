@@ -114,54 +114,55 @@
     createStars(); // Call the function to generate stars
 
     async function submitForm(event) {
-      event.preventDefault(); // Prevent form submission
+    event.preventDefault(); // Prevent form submission
 
-      const form = document.getElementById('alumniForm');
-      const formData = new FormData(form);
-      const data = Object.fromEntries(formData);
+    const form = document.getElementById('alumniForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
 
-      const token = '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'; // Replace with your GitHub token
-      const repo = 'JStudioSystems/batch2007alumni'; // Replace with your repo name
-      const path = 'details.json'; // The file where data will be saved
+    const token = 'YOUR_GITHUB_TOKEN'; // Replace with your GitHub token
+    const repo = 'JStudioSystems/batch2007alumni'; // Your repo name
+    const path = 'details.json'; // The file where data will be saved
 
-      // Fetch existing data
-      const existingResponse = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+    // Fetch existing data
+    const existingResponse = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
         headers: {
-          'Authorization': `token ${token}` // Include token in the headers
+            'Authorization': `token ${token}` // Include token in the headers
         }
-      });
+    });
 
-      let existingData = [];
+    let existingData = [];
 
-      if (existingResponse.ok) {
+    if (existingResponse.ok) {
         const existingJson = await existingResponse.json();
         const content = atob(existingJson.content);
         existingData = JSON.parse(content);
-      }
+    }
 
-      // Append new data
-      existingData.push(data);
+    // Append new data
+    existingData.push(data);
 
-      // Save updated data to GitHub
-      const response = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+    // Save updated data to GitHub
+    const response = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
         method: 'PUT',
         headers: {
-          'Authorization': `token ${token}`,
-          'Content-Type': 'application/json',
+            'Authorization': `token ${token}`,
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: 'Update details.json',
-          content: btoa(JSON.stringify(existingData, null, 2)),
-          sha: existingResponse.ok ? existingJson.sha : undefined, // Required to update the file
+            message: 'Update details.json',
+            content: btoa(JSON.stringify(existingData, null, 2)),
+            sha: existingResponse.ok ? existingJson.sha : undefined, // Required to update the file
         }),
-      });
+    });
 
-      if (response.ok) {
+    if (response.ok) {
         alert('Data saved successfully!');
-      } else {
+    } else {
         alert('Failed to save data: ' + response.statusText);
-      }
     }
+}
+
   </script>
 
 </body>
