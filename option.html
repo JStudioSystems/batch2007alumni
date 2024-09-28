@@ -1,4 +1,3 @@
-<!-- Page 1: index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -72,13 +71,12 @@
   <div class="glass max-w-sm w-full p-8 text-center transform transition-transform duration-500 hover:scale-105">
     <h2 class="text-2xl font-semibold text-white mb-6">Please let us know</h2>
    
-    <form action="https://formspree.io/f/xyzgrjny" method="POST" id="alumniForm" class="space-y-4">>
-
+    <form action="https://formspree.io/f/xyzgrjny" method="POST" id="alumniForm" class="space-y-4">
       <div>
-        <input type="text" id="fullName" placeholder="Full Name" class="w-full px-4 py-2 bg-transparent border border-gray-300 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-400" required>
+        <input type="text" id="fullName" name="fullName" placeholder="Full Name" class="w-full px-4 py-2 bg-transparent border border-gray-300 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-400" required>
       </div>
       <div>
-        <select id="section" class="w-full px-4 py-2 bg-transparent border border-gray-300 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-pink-400" required>
+        <select id="section" name="section" class="w-full px-4 py-2 bg-transparent border border-gray-300 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-pink-400" required>
           <option class="bg-transparent text-black" value="" disabled selected>Select your section</option>
           <option class="bg-transparent text-black" value="Aphrodite">Aphrodite</option>
           <option class="bg-transparent text-black" value="Minerva">Minerva</option>
@@ -87,19 +85,19 @@
         </select>      
       </div>
       <div>
-        <input type="text" id="contactNumber" placeholder="Contact Number" class="w-full px-4 py-2 bg-transparent border border-gray-300 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-400">
+        <input type="text" id="contactNumber" name="contactNumber" placeholder="Contact Number" class="w-full px-4 py-2 bg-transparent border border-gray-300 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-400">
       </div>
 
       <div>
-        <button type="button" onclick="saveDetails('joining')" class="w-full bg-gradient-to-r from-yellow-300 via-green-500 to-yellow-300 text-white px-4 py-2 rounded-lg hover:opacity-90 transition duration-300">Yes I am joining</button>
+        <button type="submit" name="decision" value="joining" class="w-full bg-gradient-to-r from-yellow-300 via-green-500 to-yellow-300 text-white px-4 py-2 rounded-lg hover:opacity-90 transition duration-300">Yes I am joining</button>
       </div>
 
       <div>
-        <button type="button" onclick="saveDetails('contributing')" class="w-full bg-gradient-to-r from-blue-300 via-teal-500 to-blue-300 text-white px-4 py-2 rounded-lg hover:opacity-90 transition duration-300">I cannot join but I want to contribute</button>
+        <button type="submit" name="decision" value="contributing" class="w-full bg-gradient-to-r from-blue-300 via-teal-500 to-blue-300 text-white px-4 py-2 rounded-lg hover:opacity-90 transition duration-300">I cannot join but I want to contribute</button>
       </div>
 
       <div>
-        <button type="button" onclick="saveDetails('not_joining')" class="w-full bg-gradient-to-r from-red-500 via-orange-500 to-red-500 text-white px-4 py-2 rounded-lg hover:opacity-90 transition duration-300">Sorry, I can't</button>
+        <button type="submit" name="decision" value="not_joining" class="w-full bg-gradient-to-r from-red-500 via-orange-500 to-red-500 text-white px-4 py-2 rounded-lg hover:opacity-90 transition duration-300">Sorry, I can't</button>
       </div>
     </form>
  
@@ -120,52 +118,6 @@
         starField.appendChild(star);
       }
     }
-
-    // Function to save details via AJAX
-    function saveDetails(decision) {
-      const fullName = document.getElementById('fullName').value;
-      const section = document.getElementById('section').value;
-      const contactNumber = document.getElementById('contactNumber').value; // Still retrieve but not required
-
-      // Check if required fields are filled
-      if (!fullName || !section) {
-        alert('Please fill in all required fields before submitting.');
-        return; // Exit the function if validation fails
-      }
-
-      const formData = {
-        fullName: fullName,
-        section: section,
-        contactNumber: contactNumber, // Include contact number even though it's optional
-        decision: decision // Add the decision to the data
-      };
-
-      fetch('save_details.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert('Details saved successfully!');
-          document.body.classList.add('fade-out'); // Add the fade-out effect
-          setTimeout(() => {
-            window.location.href = 'index.html'; // Redirect to Page 2
-          }, 500); // Delay to allow the fade-out animation to complete
-        } else {
-          alert('Error saving details: ' + data.message);
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while saving details.');
-      });
-    }
-
-
 
     createStars(); // Call the function to generate stars
   </script>
