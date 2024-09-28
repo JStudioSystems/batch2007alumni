@@ -15,7 +15,6 @@
         transform: translate(1000px, 500px);
       }
     }
-
     /* Creating the star field */
     .star {
       position: absolute;
@@ -24,7 +23,6 @@
       animation: starAnim 50s linear infinite;
       opacity: 0.5;
     }
-
     /* Glassmorphism Style */
     .glass {
       background: rgba(255, 255, 255, 0.2);
@@ -32,9 +30,8 @@
       box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
       border-radius: 10px;
       border: 1px solid rgba(255, 255, 255, 0.18);
-      transition: transform 0.5s ease; /* Add transition for form scaling */
+      transition: transform 0.5s ease;
     }
-
     /* Galaxy Background */
     .galaxy-bg {
       background: radial-gradient(circle, rgba(34, 34, 34, 1) 0%, rgba(0, 0, 0, 1) 100%);
@@ -42,19 +39,16 @@
       position: relative;
       height: 100vh;
     }
-
     /* Fade-out Animation */
     .fade-out {
       opacity: 0;
-      transition: opacity 0.5s ease; /* Smooth transition */
+      transition: opacity 0.5s ease;
     }
-
     /* Fade-in Animation */
     .fade-in {
       opacity: 0;
       animation: fadeIn 0.5s forwards;
     }
-
     @keyframes fadeIn {
       to {
         opacity: 1;
@@ -71,36 +65,34 @@
   <div class="glass max-w-sm w-full p-8 text-center transform transition-transform duration-500 hover:scale-105">
     <h2 class="text-2xl font-semibold text-white mb-6">Please let us know</h2>
    
-    <form action="https://formspree.io/f/xyzgrjny" method="POST" id="alumniForm" class="space-y-4">
+    <!-- Form with JavaScript handling -->
+    <form id="alumniForm" class="space-y-4" onsubmit="submitForm(event)">
       <div>
-        <input type="text" id="fullName" name="fullName" placeholder="Full Name" class="w-full px-4 py-2 bg-transparent border border-gray-300 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-400" required>
+        <input type="text" name="fullName" placeholder="Full Name" class="w-full px-4 py-2 bg-transparent border border-gray-300 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-400" required>
       </div>
       <div>
-        <select id="section" name="section" class="w-full px-4 py-2 bg-transparent border border-gray-300 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-pink-400" required>
+        <select name="section" class="w-full px-4 py-2 bg-transparent border border-gray-300 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-pink-400" required>
           <option class="bg-transparent text-black" value="" disabled selected>Select your section</option>
           <option class="bg-transparent text-black" value="Aphrodite">Aphrodite</option>
           <option class="bg-transparent text-black" value="Minerva">Minerva</option>
           <option class="bg-transparent text-black" value="Jupiter">Jupiter</option>
-          <!-- Add more options as needed -->
-        </select>      
+        </select>
       </div>
       <div>
-        <input type="text" id="contactNumber" name="contactNumber" placeholder="Contact Number" class="w-full px-4 py-2 bg-transparent border border-gray-300 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-400">
+        <input type="text" name="contactNumber" placeholder="Contact Number" class="w-full px-4 py-2 bg-transparent border border-gray-300 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-400">
       </div>
 
+      <!-- Buttons with different decisions -->
       <div>
         <button type="submit" name="decision" value="joining" class="w-full bg-gradient-to-r from-yellow-300 via-green-500 to-yellow-300 text-white px-4 py-2 rounded-lg hover:opacity-90 transition duration-300">Yes I am joining</button>
       </div>
-
       <div>
         <button type="submit" name="decision" value="contributing" class="w-full bg-gradient-to-r from-blue-300 via-teal-500 to-blue-300 text-white px-4 py-2 rounded-lg hover:opacity-90 transition duration-300">I cannot join but I want to contribute</button>
       </div>
-
       <div>
         <button type="submit" name="decision" value="not_joining" class="w-full bg-gradient-to-r from-red-500 via-orange-500 to-red-500 text-white px-4 py-2 rounded-lg hover:opacity-90 transition duration-300">Sorry, I can't</button>
       </div>
     </form>
- 
   </div>
 
   <!-- Generating Stars -->
@@ -120,6 +112,56 @@
     }
 
     createStars(); // Call the function to generate stars
+
+    async function submitForm(event) {
+      event.preventDefault(); // Prevent form submission
+
+      const form = document.getElementById('alumniForm');
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData);
+
+      const token = 'YOUR_GITHUB_TOKEN'; // Replace with your GitHub token
+      const repo = 'yourusername/alumni2007-data'; // Replace with your repo name
+      const path = 'details.json'; // The file where data will be saved
+
+      // Fetch existing data
+      const existingResponse = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+        headers: {
+          'Authorization': `token ${token}` // Include token in the headers
+        }
+      });
+
+      let existingData = [];
+
+      if (existingResponse.ok) {
+        const existingJson = await existingResponse.json();
+        const content = atob(existingJson.content);
+        existingData = JSON.parse(content);
+      }
+
+      // Append new data
+      existingData.push(data);
+
+      // Save updated data to GitHub
+      const response = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: 'Update details.json',
+          content: btoa(JSON.stringify(existingData, null, 2)),
+          sha: existingResponse.ok ? existingJson.sha : undefined, // Required to update the file
+        }),
+      });
+
+      if (response.ok) {
+        alert('Data saved successfully!');
+      } else {
+        alert('Failed to save data: ' + response.statusText);
+      }
+    }
   </script>
 
 </body>
