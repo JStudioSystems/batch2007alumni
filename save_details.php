@@ -1,43 +1,34 @@
 <?php
-// save_details.php
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $fullName = $_POST['fullName'];
+    $section = $_POST['section'];
+    $contactNumber = $_POST['contactNumber'];
+    $decision = $_POST['decision'];
 
-header('Content-Type: application/json');
+    // Prepare data to save
+    $data = [
+        'fullName' => $fullName,
+        'section' => $section,
+        'contactNumber' => $contactNumber,
+        'decision' => $decision
+    ];
 
-$input = json_decode(file_get_contents('php://input'), true);
-
-if (!isset($input['fullName']) || !isset($input['section']) || !isset($input['contactNumber']) || !isset($input['decision'])) {
-    echo json_encode(['success' => false, 'message' => 'Invalid input data']);
-    exit;
-}
-
-$data = [
-    'fullName' => $input['fullName'],
-    'section' => $input['section'],
-    'contactNumber' => $input['contactNumber'],
-    'decision' => $input['decision'], // Add decision to the data
-    'timestamp' => date('Y-m-d H:i:s')
-];
-
-// Path to the JSON file
-$jsonFilePath = 'details.json';
-
-// Read existing data
-if (file_exists($jsonFilePath)) {
-    $existingData = json_decode(file_get_contents($jsonFilePath), true);
-    if (!is_array($existingData)) {
-        $existingData = [];
-    }
-} else {
+    // Load existing data
+    $filePath = 'details.json';
     $existingData = [];
-}
 
-// Add new data
-$existingData[] = $data;
+    if (file_exists($filePath)) {
+        $existingData = json_decode(file_get_contents($filePath), true);
+    }
 
-// Save the updated data to the JSON file
-if (file_put_contents($jsonFilePath, json_encode($existingData, JSON_PRETTY_PRINT))) {
-    echo json_encode(['success' => true]);
-} else {
-    echo json_encode(['success' => false, 'message' => 'Error saving details']);
+    // Add new data
+    $existingData[] = $data;
+
+    // Save updated data
+    file_put_contents($filePath, json_encode($existingData, JSON_PRETTY_PRINT));
+
+    // Redirect back to the form
+    header('Location: index.html');
+    exit;
 }
 ?>
