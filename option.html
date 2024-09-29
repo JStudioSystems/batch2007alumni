@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SI Batch 2007 Alumni</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* Keyframes for star animation */
-    @keyframes starAnim {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SI Batch 2007 Alumni</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes starAnim {
             0% { transform: translate(0, 0); }
             100% { transform: translate(1000px, 500px); }
         }
@@ -41,12 +40,12 @@
 <div class="glass max-w-sm w-full p-8 text-center">
     <h2 class="text-2xl font-semibold text-white mb-6">Please let us know</h2>
 
-    <form id="alumniForm" class="space-y-4" onsubmit="saveData(event)">
+    <form id="alumniForm" class="space-y-4" method="POST" action="save_details.php">
         <div>
-            <input type="text" id="fullName" placeholder="Full Name" class="w-full px-4 py-2 bg-transparent border border-gray-300 rounded-lg text-white placeholder-gray-500" required>
+            <input type="text" name="fullName" placeholder="Full Name" class="w-full px-4 py-2 bg-transparent border border-gray-300 rounded-lg text-white placeholder-gray-500" required>
         </div>
         <div>
-            <select id="section" class="w-full px-4 py-2 bg-transparent border border-gray-300 rounded-lg text-white" required>
+            <select name="section" class="w-full px-4 py-2 bg-transparent border border-gray-300 rounded-lg text-white" required>
                 <option class="bg-transparent text-black" value="" disabled selected>Select your section</option>
                 <option class="bg-transparent text-black" value="Aphrodite">Aphrodite</option>
                 <option class="bg-transparent text-black" value="Minerva">Minerva</option>
@@ -54,60 +53,24 @@
             </select>
         </div>
         <div>
-            <input type="text" id="contactNumber" placeholder="Contact Number" class="w-full px-4 py-2 bg-transparent border border-gray-300 rounded-lg text-white placeholder-gray-500">
+            <input type="text" name="contactNumber" placeholder="Contact Number" class="w-full px-4 py-2 bg-transparent border border-gray-300 rounded-lg text-white placeholder-gray-500">
         </div>
 
         <div>
-            <button type="submit" value="joining" class="w-full bg-gradient-to-r from-yellow-300 via-green-500 to-yellow-300 text-white px-4 py-2 rounded-lg">Yes I am joining</button>
+            <button type="submit" name="decision" value="joining" class="w-full bg-gradient-to-r from-yellow-300 via-green-500 to-yellow-300 text-white px-4 py-2 rounded-lg">Yes I am joining</button>
         </div>
 
         <div>
-            <button type="submit" value="contributing" class="w-full bg-gradient-to-r from-blue-300 via-teal-500 to-blue-300 text-white px-4 py-2 rounded-lg">I cannot join but I want to contribute</button>
+            <button type="submit" name="decision" value="contributing" class="w-full bg-gradient-to-r from-blue-300 via-teal-500 to-blue-300 text-white px-4 py-2 rounded-lg">I cannot join but I want to contribute</button>
         </div>
 
         <div>
-            <button type="submit" value="not_joining" class="w-full bg-gradient-to-r from-red-500 via-orange-500 to-red-500 text-white px-4 py-2 rounded-lg">Sorry, I can't</button>
+            <button type="submit" name="decision" value="not_joining" class="w-full bg-gradient-to-r from-red-500 via-orange-500 to-red-500 text-white px-4 py-2 rounded-lg">Sorry, I can't</button>
         </div>
     </form>
 </div>
 
 <script>
-    function saveData(event) {
-        event.preventDefault(); // Prevent form submission
-
-        // Get form data
-        const fullName = document.getElementById('fullName').value;
-        const section = document.getElementById('section').value;
-        const contactNumber = document.getElementById('contactNumber').value;
-        const decision = event.submitter.value; // Get value of the button clicked
-
-        // Create an object to hold the data
-        const formData = {
-            fullName: fullName,
-            section: section,
-            contactNumber: contactNumber,
-            decision: decision
-        };
-
-        // Convert formData to JSON
-        const json = JSON.stringify(formData, null, 2);
-
-        // Create a Blob from the JSON data
-        const blob = new Blob([json], { type: 'application/json' });
-
-        // Create a link to download the Blob
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'details.json';
-        link.click();
-
-        // Optional: Display a success message
-        alert('Data saved successfully! Downloading details.json...');
-        
-        // Clear the form
-        document.getElementById('alumniForm').reset();
-    }
-
     function createStars() {
         const starField = document.querySelector('.galaxy-bg');
         for (let i = 0; i < 100; i++) {
