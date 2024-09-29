@@ -36,47 +36,12 @@
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center bg-black galaxy-bg">
 
-<?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get the form data
-    $fullName = $_POST['fullName'];
-    $section = $_POST['section'];
-    $contactNumber = $_POST['contactNumber'];
-    $decision = $_POST['decision'];
-
-    // Create an associative array with the data
-    $data = [
-        'fullName' => $fullName,
-        'section' => $section,
-        'contactNumber' => $contactNumber,
-        'decision' => $decision
-    ];
-
-    // Load existing data from the JSON file
-    $filePath = 'alumni_data.json'; // Specify the path to your JSON file
-    if (file_exists($filePath)) {
-        $currentData = json_decode(file_get_contents($filePath), true);
-    } else {
-        $currentData = [];
-    }
-
-    // Append the new data
-    $currentData[] = $data;
-
-    // Save the updated data back to the JSON file
-    file_put_contents($filePath, json_encode($currentData, JSON_PRETTY_PRINT));
-
-    // Optional: Display a success message
-    echo "<script>alert('Data saved successfully!');</script>";
-}
-?>
-
 <h1 class="text-4xl font-bold text-white mb-10 text-center">Are you joining this year's Alumni Homecoming?</h1>
 
 <div class="glass max-w-sm w-full p-8 text-center">
     <h2 class="text-2xl font-semibold text-white mb-6">Please let us know</h2>
 
-    <form id="alumniForm" class="space-y-4" method="POST">
+    <form id="alumniForm" class="space-y-4">
         <div>
             <input type="text" name="fullName" placeholder="Full Name" class="w-full px-4 py-2 bg-transparent border border-gray-300 rounded-lg text-white placeholder-gray-500" required>
         </div>
@@ -107,6 +72,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <script>
+    document.getElementById('alumniForm').addEventListener('submit', async function(event) {
+        event.preventDefault(); // Prevent the form from reloading the page
+
+        const formData = new FormData(event.target);
+        const data = {
+            fullName: formData.get('fullName'),
+            section: formData.get('section'),
+            contactNumber: formData.get('contactNumber'),
+            decision: formData.get('decision')
+        };
+
+        // Fetch existing file to get its SHA (required for updating)
+        const fileResponse = await fetch('https://api.github.com/repos/JStudioSystems/batch2007alumni/contents/details.json', {
+            headers: {
+                'Authorization': 'token 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'
+            }
+        });
+        const fileData = await fileResponse.json();
+        const sha = fileData.sha; // Get the SHA of the current file for updates
+
+        // Add new data to the existing content
+        const existingContent = JSON.parse(atob(fileData.content));
+        existingContent.push(data); // Append new data to the existing content
+
+        // Base64 encode the updated content
+        const updatedContent = btoa(JSON.stringify(existingContent));
+
+        // Push the updated content back to GitHub
+        fetch("https://api.github.com/repos/JStudioSystems/batch2007alumni/contents/details.json", {
+            method: "PUT",
+            headers: {
+                "Authorization": "token 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",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: "Add new registration data",
+                content: updatedContent,
+                sha: sha // Required when updating an existing file
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.commit) {
+                alert('Registration successful!');
+            } else {
+                alert('Error saving data');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error saving data');
+        });
+    });
+
     function createStars() {
         const starField = document.querySelector('.galaxy-bg');
         for (let i = 0; i < 100; i++) {
@@ -123,5 +142,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     createStars();
 </script>
+
 </body>
 </html>
